@@ -168,8 +168,225 @@ Typical classifications include:
 
 Side effects SHALL be considered during Policy evaluation.
 
+## Tool Lifecycle
+
+Every Tool invocation SHALL follow a well-defined lifecycle.
+
+The lifecycle ensures consistent execution, policy enforcement, and auditability across all Tool implementations.
+
+The logical lifecycle is:
+
+Requested
+
+↓
+
+Authorized
+
+↓
+
+Prepared
+
+↓
+
+Executing
+
+↓
+
+Completed
+
+or
+
+Failed
+
+or
+
+Cancelled
+
+Each transition SHALL be observable.
+
+## Tool Discovery
+
+Tools SHALL be discoverable through a Tool Registry.
+
+The Tool Registry SHALL provide metadata only.
+
+Tool discovery SHALL NOT imply authorization.
+
+A discovered Tool SHALL remain unavailable until Policy evaluation and Capability validation have completed.
+
+## Tool Registration
+
+Every Tool SHALL be registered before invocation.
+
+Registration SHALL include:
+
+* Tool Identifier;
+* Tool Version;
+* Interface Definition;
+* Required Capabilities;
+* Side Effect Classification;
+* Supported Operations.
+
+Registration SHALL NOT execute the Tool.
+
+## Invocation
+
+Tool invocation SHALL occur only through the Kernel.
+
+Direct invocation by reasoning components is prohibited.
+
+Every invocation SHALL reference:
+
+* the originating Message ID;
+* the associated Task ID;
+* the Execution Context ID;
+* the Decision authorizing execution.
+
+Invocation SHALL create an audit event.
+
+## Execution Context
+
+A Tool executes within an isolated execution context.
+
+Execution context isolation SHOULD prevent unintended interaction between concurrent Tool invocations.
+
+Isolation mechanisms are implementation-specific.
+
+Examples include:
+
+* operating system processes;
+* containers;
+* virtual environments;
+* sandboxed runtimes.
+
+## Statelessness
+
+Tools SHOULD be stateless.
+
+Persistent state SHOULD be maintained by dedicated architectural components.
+
+Examples include:
+
+* Memory Architecture;
+* Task Management;
+* Workspace Storage.
+
+A Tool SHALL NOT rely on hidden mutable state.
+
+## Resource Access
+
+Every external resource accessed by a Tool SHALL be explicitly identified.
+
+Examples include:
+
+* files;
+* directories;
+* network endpoints;
+* databases;
+* message queues;
+* hardware devices.
+
+Resource access SHALL be constrained by the granted Capabilities.
+
+## Side Effect Declaration
+
+Every Tool SHALL declare its expected side effects before execution.
+
+Declared side effects SHOULD include:
+
+* filesystem modification;
+* network communication;
+* process creation;
+* package installation;
+* configuration changes;
+* irreversible operations.
+
+Undeclared side effects constitute non-compliant behavior.
+
+## Cancellation
+
+Cancellation SHALL be cooperative whenever practical.
+
+A Tool SHOULD terminate execution safely upon receiving a cancellation request.
+
+If immediate termination is impossible, the Tool SHALL report its current execution state.
+
+Cancellation SHALL generate both Event and Result Messages.
+
+## Timeout Handling
+
+Tools SHOULD declare an expected execution duration.
+
+The Kernel MAY terminate execution exceeding permitted limits.
+
+Timeout policies are determined by the Policy Model.
+
+Timeout termination SHALL be auditable.
+
+## Concurrency
+
+Multiple Tool invocations MAY execute concurrently.
+
+Concurrent execution SHALL NOT violate:
+
+* Capability constraints;
+* Policy decisions;
+* resource isolation;
+* audit consistency.
+
+Concurrency control remains implementation-specific.
+
+## Retry Behavior
+
+Retry policies SHALL be explicitly defined.
+
+Retries SHALL create new invocations.
+
+Retries SHALL preserve references to previous attempts.
+
+Automatic retries SHALL remain subject to Policy evaluation.
+
+## Failure Reporting
+
+Tool failures SHALL be reported using Result Messages.
+
+Failures SHALL distinguish between:
+
+* Tool failure;
+* environmental failure;
+* authorization failure;
+* dependency failure.
+
+Failure reports SHOULD support automated recovery where practical.
+
+## Tool Replacement
+
+Tools MAY be replaced without affecting architectural behavior.
+
+Replacement Tools SHALL preserve:
+
+* Tool Identifier;
+* interface contract;
+* observable semantics.
+
+Implementation details MAY change.
+
+Architectural behavior SHALL remain compatible.
+
+## Compliance
+
+A compliant Tool SHALL:
+
+* expose an explicit contract;
+* require explicit authorization;
+* execute only requested operations;
+* declare side effects;
+* produce observable outcomes;
+* generate audit records;
+* preserve protocol semantics.
+
 ## Closing Statement
 
-The Tool Interface separates reasoning from execution.
+The Tool Lifecycle defines the execution boundary between reasoning and action.
 
-By abstracting implementation details behind a stable architectural contract, the AI Kernel enables secure, auditable, and replaceable interaction with arbitrary execution environments.
+By requiring explicit registration, authorization, invocation, and observable completion, the AI Kernel ensures that every interaction with the external world remains secure, auditable, and replaceable.
