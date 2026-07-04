@@ -385,8 +385,173 @@ A compliant Tool SHALL:
 * generate audit records;
 * preserve protocol semantics.
 
+## Registry Model
+
+The Tool Registry is the authoritative catalog of executable Tools available to the AI Kernel.
+
+The Registry SHALL provide metadata describing each Tool.
+
+The Registry SHALL NOT execute Tools.
+
+The Registry SHALL NOT perform Policy evaluation.
+
+The Registry SHALL NOT grant Capabilities.
+
+The Registry is responsible solely for discovery and interface description.
+
+## Registry Requirements
+
+The Registry SHALL maintain, at minimum, the following information for each Tool:
+
+* Tool Identifier
+* Version
+* Interface Definition
+* Description
+* Required Capabilities
+* Side Effect Classification
+* Supported Operations
+* Compatibility Information
+* Operational Status
+
+Additional implementation-specific metadata MAY be stored.
+
+## Tool Availability
+
+Tool availability SHALL be explicitly represented.
+
+Recommended availability states include:
+
+* Registered
+* Enabled
+* Disabled
+* Deprecated
+* Unavailable
+
+Only Enabled Tools MAY be selected for execution.
+
+## Versioning
+
+Every Tool SHALL declare a semantic version.
+
+Version numbers SHALL identify interface compatibility rather than implementation revisions.
+
+Patch releases SHOULD preserve identical observable behavior.
+
+Minor releases MAY introduce backward-compatible functionality.
+
+Major releases MAY introduce incompatible interface changes.
+
+## Compatibility
+
+Tool compatibility SHALL be evaluated independently of implementation language.
+
+Two Tool implementations are considered compatible if they expose equivalent:
+
+* interface contracts;
+* observable behavior;
+* capability requirements;
+* side effect declarations;
+* failure semantics.
+
+Internal implementation differences SHALL NOT affect compatibility.
+
+## Interface Stability
+
+Published Tool contracts SHOULD remain stable.
+
+Breaking changes SHALL require a new major version.
+
+Deprecated interfaces SHOULD remain available for a migration period defined by the implementation.
+
+## Deprecation
+
+Deprecated Tools SHALL remain discoverable.
+
+The Registry SHALL clearly indicate deprecation status.
+
+New Task planning SHOULD avoid selecting deprecated Tools unless explicitly requested or required for compatibility.
+
+Removal of deprecated Tools SHALL occur according to implementation policy.
+
+## Tool Health
+
+Implementations MAY monitor Tool health.
+
+Health monitoring MAY include:
+
+* availability;
+* responsiveness;
+* dependency status;
+* execution success rate;
+* recent failures.
+
+Health information SHALL influence Tool selection but SHALL NOT modify Tool contracts.
+
+## Tool Selection
+
+The selection of a Tool is the responsibility of planning components.
+
+The Registry SHALL NOT rank or recommend Tools.
+
+Selection criteria MAY include:
+
+* Capability requirements;
+* Policy constraints;
+* operational health;
+* execution cost;
+* historical reliability.
+
+Selection algorithms are outside the scope of this specification.
+
+## Tool Isolation
+
+Failure of one Tool SHALL NOT compromise unrelated Tools.
+
+Implementations SHOULD isolate Tool execution to minimize fault propagation.
+
+Isolation mechanisms are implementation-specific.
+
+## Tool Dependencies
+
+A Tool MAY depend upon external software or services.
+
+Dependencies SHOULD be declared through Tool metadata.
+
+Hidden runtime dependencies SHOULD be avoided.
+
+Dependency resolution is implementation-specific.
+
+## Security Considerations
+
+Registration in the Tool Registry SHALL NOT imply trust.
+
+Every Tool invocation SHALL undergo independent:
+
+* identity verification;
+* Capability validation;
+* Policy evaluation.
+
+Tools SHALL execute with the minimum privileges necessary to perform the requested operation.
+
+Implementations SHOULD support execution sandboxing where practical.
+
+## Extension Model
+
+The Tool Interface is designed for incremental evolution.
+
+Future RFCs MAY introduce:
+
+* streaming outputs;
+* long-running execution sessions;
+* distributed execution;
+* hardware-backed Tools;
+* transactional execution;
+* capability negotiation.
+
+Such extensions SHALL preserve backward compatibility whenever practical.
+
 ## Closing Statement
 
-The Tool Lifecycle defines the execution boundary between reasoning and action.
+The Tool Interface establishes the architectural boundary between reasoning and execution.
 
-By requiring explicit registration, authorization, invocation, and observable completion, the AI Kernel ensures that every interaction with the external world remains secure, auditable, and replaceable.
+By defining a stable, implementation-independent contract for executable capabilities, the AI Kernel enables secure, auditable, replaceable, and extensible interaction with external systems while maintaining strict separation between decision-making and execution.
