@@ -18,7 +18,7 @@ class CapabilityManager:
     
     def add_capability(self, capability: Capability) -> bool:
         """Registers a new capability if it doesn't conflict with an existing one."""
-        if self.capabilities[capability.name]:
+        if capability.name in self.capabilities:
             print(f"Warning: Capability '{capability.name}' already exists. Overwriting might be undesirable.")
             return False # 既存定義を尊重し、オーバーライトしない
         
