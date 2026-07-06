@@ -14,6 +14,7 @@ from typing import List, Dict, Any, Optional
 
 from src.models.core_entities import Task, ExecutionStep
 from src.managers.audit_logger import audit_logger
+from src.managers.validation_helper import ExecutionValidator
 
 from ai_kernel._logging import manager_logger
 
@@ -21,6 +22,7 @@ from ai_kernel._logging import manager_logger
 class Reviewer:
     """
     Validates execution results and provides feedback for improvement.
+    Delegates validation logic to ExecutionValidator.
     """
     def __init__(self):
         manager_logger.info("Reviewer initialized: Ready for result validation.")
@@ -42,45 +44,22 @@ class Reviewer:
         """
         manager_logger.info(f"Reviewing task: {task.task_id}")
         
+        # Delegate validation to ExecutionValidator
+        step_validation = ExecutionValidator.validate_execution_steps(execution_steps)
+        
         validation_result = {
             "task_id": task.task_id,
-            "status": "SUCCESS",
-            "steps_executed": len(execution_steps),
-            "issues": [],
-            "recommendations": []
+            "status": ExecutionValidator.classify_overall_status(
+                step_validation['error_steps'],
+                step_validation['warning_steps'],
+                step_validation['successful_steps']
+            ),
+            "steps_executed": step_validation['total_steps'],
+            "issues": step_validation['issues'],
+            "recommendations": self._generate_recommendations(
+                task, step_validation
+            )
         }
-        
-        # Check if any steps were executed
-        if len(execution_steps) == 0:
-            validation_result["status"] = "WARNING"
-            validation_result["issues"].append("No execution steps completed")
-            validation_result["recommendations"].append(
-                "Verify that required capabilities were granted"
-            )
-        
-        # Check each execution step for issues
-        for step in execution_steps:
-            if not step.actual_output:
-                validation_result["status"] = "WARNING"
-                validation_result["issues"].append(
-                    f"Tool '{step.tool_name}' produced no output"
-                )
-            
-            # Check for common error indicators in output
-            if step.actual_output and any(
-                err in step.actual_output.lower() 
-                for err in ["error", "failed", "exception"]
-            ):
-                validation_result["status"] = "FAILED"
-                validation_result["issues"].append(
-                    f"Tool '{step.tool_name}' reported an error"
-                )
-        
-        # Check task dependencies
-        if task.dependencies:
-            validation_result["recommendations"].append(
-                "Task has dependencies - ensure they completed successfully"
-            )
         
         # Log the review
         audit_logger.log(
@@ -91,6 +70,28 @@ class Reviewer:
         )
         
         return validation_result
+    
+    def _generate_recommendations(
+        self,
+        task: Task,
+        validation: Dict[str, Any]
+    ) -> List[str]:
+        """Generate recommendations based on validation results."""
+        recommendations = []
+        
+        if validation['error_steps'] > 0:
+            recommendations.append("Review failed steps - check capability permissions")
+        
+        if validation['warning_steps'] > 0:
+            recommendations.append("Investigate warnings in execution output")
+        
+        if validation['total_steps'] == 0:
+            recommendations.append("No steps executed - verify required capabilities were granted")
+        
+        if task.dependencies:
+            recommendations.append("Verify task dependencies completed successfully")
+        
+        return recommendations
     
     def review_plan_execution(
         self, 
@@ -110,9 +111,9 @@ class Reviewer:
         manager_logger.info(f"Reviewing plan execution: {len(tasks)} tasks")
         
         task_reviews = []
-        success_count = 0
+        error_count = 0
         warning_count = 0
-        failed_count = 0
+        success_count = 0
         
         for task, steps in zip(tasks, execution_results):
             review = self.review_task_execution(task, steps)
@@ -120,26 +121,24 @@ class Reviewer:
             
             if review["status"] == "SUCCESS":
                 success_count += 1
-            elif review["status"] == "WARNING":
+            elif review["status"] == "PARTIAL":
                 warning_count += 1
             else:
-                failed_count += 1
+                error_count += 1
         
-        overall_status = "SUCCESS"
-        if failed_count > 0:
-            overall_status = "FAILED"
-        elif warning_count > 0:
-            overall_status = "PARTIAL"
+        overall_status = ExecutionValidator.classify_overall_status(
+            error_count, warning_count, success_count
+        )
         
         return {
             "overall_status": overall_status,
             "total_tasks": len(tasks),
             "successful_tasks": success_count,
             "warning_tasks": warning_count,
-            "failed_tasks": failed_count,
+            "failed_tasks": error_count,
             "task_reviews": task_reviews,
             "overall_recommendations": self._generate_overall_recommendations(
-                overall_status, success_count, warning_count, failed_count
+                overall_status, success_count, warning_count, error_count
             )
         }
     
@@ -161,7 +160,6 @@ class Reviewer:
             recommendations.append("Review logs for detailed error information")
         else:
             recommendations.append("Execution completed successfully")
-            recommendations.append("Consider optimizing workflow for better performance")
         
         return recommendations
 
