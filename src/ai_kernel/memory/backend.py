@@ -130,38 +130,39 @@ class InMemoryBackend(MemoryBackend):
         results = []
         
         for memory in self._memories.values():
-            # Filter by scope
-            if query.scope and memory.scope != query.scope:
-                continue
-            
-            # Filter by keywords
-            if query.keywords:
-                if not any(kw.lower() in memory.content.lower() for kw in query.keywords):
-                    continue
-            
-            # Filter by tags
-            if query.tags:
-                if not any(tag in memory.tags for tag in query.tags):
-                    continue
-            
-            # Filter by metadata
-            if query.metadata_filters:
-                match = True
-                for key, value in query.metadata_filters.items():
-                    if memory.metadata.get(key) != value:
-                        match = False
-                        break
-                if not match:
-                    continue
-            
-            # Filter by timestamp
-            if query.since and memory.created_at < query.since:
-                continue
-            
-            results.append(memory)
+            if self._matches_query(memory, query):
+                results.append(memory)
         
         # Apply limit
         return results[:query.limit]
+    
+    def _matches_query(self, memory: MemoryObject, query: MemoryQuery) -> bool:
+        """Check if a memory object matches the query criteria."""
+        # Filter by scope
+        if query.scope and memory.scope != query.scope:
+            return False
+        
+        # Filter by keywords
+        if query.keywords:
+            if not any(kw.lower() in memory.content.lower() for kw in query.keywords):
+                return False
+        
+        # Filter by tags
+        if query.tags:
+            if not any(tag in memory.tags for tag in query.tags):
+                return False
+        
+        # Filter by metadata
+        if query.metadata_filters:
+            for key, value in query.metadata_filters.items():
+                if memory.metadata.get(key) != value:
+                    return False
+        
+        # Filter by timestamp
+        if query.since and memory.created_at < query.since:
+            return False
+        
+        return True
 
     def update(self, memory: MemoryObject) -> None:
         """Update an existing memory object."""
