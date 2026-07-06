@@ -15,8 +15,28 @@ from ai_kernel.model.task import Task
 from ai_kernel.model.execution import ExecutionState
 
 console = Console()
-kernel = Kernel()
-executor_registry = ExecutorRegistry()
+
+# Factory functions for lazy initialization
+_kernel_instance = None
+_executor_registry_instance = None
+
+def get_kernel() -> Kernel:
+    """Get the singleton Kernel instance."""
+    global _kernel_instance
+    if _kernel_instance is None:
+        _kernel_instance = Kernel()
+    return _kernel_instance
+
+def get_executor_registry() -> ExecutorRegistry:
+    """Get the singleton ExecutorRegistry instance."""
+    global _executor_registry_instance
+    if _executor_registry_instance is None:
+        _executor_registry_instance = ExecutorRegistry()
+    return _executor_registry_instance
+
+# Backward compatibility aliases
+kernel = get_kernel()
+executor_registry = get_executor_registry()
 
 app = typer.Typer(help="AI Kernel")
 

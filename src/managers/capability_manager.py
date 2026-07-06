@@ -37,9 +37,16 @@ class CapabilityManager:
         """Returns all registered capabilities for inspection."""
         return list(self.capabilities.values())
 
-# =========================================
-# Singleton Access Point:
-# System components should always access this via CapabilityManager().
-# =========================================
-capability_manager = CapabilityManager()
+# Factory function for lazy initialization
+_capability_manager_instance = None
+
+def get_capability_manager() -> CapabilityManager:
+    """Get the singleton CapabilityManager instance."""
+    global _capability_manager_instance
+    if _capability_manager_instance is None:
+        _capability_manager_instance = CapabilityManager()
+    return _capability_manager_instance
+
+# Backward compatibility alias
+capability_manager = get_capability_manager()
 

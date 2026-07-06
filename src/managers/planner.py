@@ -99,5 +99,15 @@ class Planner:
             "requires_human_approval": risk_level == "HIGH"
         }
 
-# Singleton access
-planner = Planner()
+# Factory function for lazy initialization
+_planner_instance = None
+
+def get_planner() -> Planner:
+    """Get the singleton Planner instance."""
+    global _planner_instance
+    if _planner_instance is None:
+        _planner_instance = Planner()
+    return _planner_instance
+
+# Backward compatibility alias
+planner = get_planner()

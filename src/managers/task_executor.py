@@ -81,5 +81,15 @@ class TaskExecutor:
         
         return execution_steps
 
-# Singleton access
-task_executor = TaskExecutor()
+# Factory function for lazy initialization
+_task_executor_instance = None
+
+def get_task_executor() -> TaskExecutor:
+    """Get the singleton TaskExecutor instance."""
+    global _task_executor_instance
+    if _task_executor_instance is None:
+        _task_executor_instance = TaskExecutor()
+    return _task_executor_instance
+
+# Backward compatibility alias
+task_executor = get_task_executor()

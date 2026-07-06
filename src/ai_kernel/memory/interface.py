@@ -187,5 +187,15 @@ class Memory:
         return self.backend.clear_scope(scope)
 
 
-# Singleton access point for the Kernel
-memory = Memory()
+# Factory function for lazy initialization
+_memory_instance = None
+
+def get_memory() -> Memory:
+    """Get the singleton Memory instance."""
+    global _memory_instance
+    if _memory_instance is None:
+        _memory_instance = Memory()
+    return _memory_instance
+
+# Backward compatibility alias
+memory = get_memory()

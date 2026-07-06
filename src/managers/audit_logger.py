@@ -60,5 +60,15 @@ class AuditLogger:
         """Returns all audit records."""
         return self.records
 
-# Singleton access
-audit_logger = AuditLogger()
+# Factory function for lazy initialization
+_audit_logger_instance = None
+
+def get_audit_logger() -> AuditLogger:
+    """Get the singleton AuditLogger instance."""
+    global _audit_logger_instance
+    if _audit_logger_instance is None:
+        _audit_logger_instance = AuditLogger()
+    return _audit_logger_instance
+
+# Backward compatibility alias
+audit_logger = get_audit_logger()

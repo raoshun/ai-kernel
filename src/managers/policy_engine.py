@@ -48,8 +48,17 @@ class PolicyEngine:
         manager_logger.warning("No explicit ALLOW permission found for this combination.")
         return False
 
-# =========================================
-# Singleton Access Point:
-policy_engine = PolicyEngine()
+# Factory function for lazy initialization
+_policy_engine_instance = None
+
+def get_policy_engine() -> PolicyEngine:
+    """Get the singleton PolicyEngine instance."""
+    global _policy_engine_instance
+    if _policy_engine_instance is None:
+        _policy_engine_instance = PolicyEngine()
+    return _policy_engine_instance
+
+# Backward compatibility alias
+policy_engine = get_policy_engine()
 
 

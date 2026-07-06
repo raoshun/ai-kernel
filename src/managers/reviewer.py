@@ -166,5 +166,15 @@ class Reviewer:
         return recommendations
 
 
-# Singleton access
-reviewer = Reviewer()
+# Factory function for lazy initialization
+_reviewer_instance = None
+
+def get_reviewer() -> Reviewer:
+    """Get the singleton Reviewer instance."""
+    global _reviewer_instance
+    if _reviewer_instance is None:
+        _reviewer_instance = Reviewer()
+    return _reviewer_instance
+
+# Backward compatibility alias
+reviewer = get_reviewer()

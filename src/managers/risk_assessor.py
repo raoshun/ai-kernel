@@ -123,5 +123,15 @@ class RiskAssessor:
             return ["Standard monitoring"]
 
 
-# Singleton access
-risk_assessor = RiskAssessor()
+# Factory function for lazy initialization
+_risk_assessor_instance = None
+
+def get_risk_assessor() -> RiskAssessor:
+    """Get the singleton RiskAssessor instance."""
+    global _risk_assessor_instance
+    if _risk_assessor_instance is None:
+        _risk_assessor_instance = RiskAssessor()
+    return _risk_assessor_instance
+
+# Backward compatibility alias
+risk_assessor = get_risk_assessor()
