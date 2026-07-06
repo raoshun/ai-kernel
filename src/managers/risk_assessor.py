@@ -12,7 +12,10 @@ The Risk Assessor is responsible for:
 The Risk Assessor SHALL NOT execute operations.
 """
 from typing import List, Dict, Any, Literal
+
 from src.models.core_entities import Task
+
+from ai_kernel._logging import manager_logger
 
 
 class RiskAssessor:
@@ -20,7 +23,7 @@ class RiskAssessor:
     Evaluates the risk level of proposed tasks and execution plans.
     """
     def __init__(self):
-        print("--> RiskAssessor Initialized: Ready for risk analysis.")
+        manager_logger.info("RiskAssessor initialized: Ready for risk analysis.")
     
     def assess_task_risk(self, task: Task) -> Dict[str, Any]:
         """

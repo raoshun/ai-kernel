@@ -1,6 +1,9 @@
 from typing import List, Dict
+
 from src.models.core_entities import Authority, Capability, Permission
 from src.managers.capability_manager import capability_manager
+
+from ai_kernel._logging import manager_logger
 
 class PolicyEngine:
     """
@@ -12,23 +15,23 @@ class PolicyEngine:
         self.capability_manager = capability_manager
         # 実際のポリシーセット（ロードされるべき設定）
         self._policies: Dict[str, List[Permission]] = {}
-        print("--> PolicyEngine Initialized: Awaiting policy rules definition.")
+        manager_logger.info("PolicyEngine initialized: Awaiting policy rules definition.")
     
     def load_policy(self, principal_id: str, policies: List[Permission]) -> None:
         """Loads a set of permissions for a specific Principal ID/Role combination."""
         # 実際には、より複雑なロールベースの階層構造が必要だが、MVPとしてシンプルに実装
         self._policies[principal_id] = policies
-        print(f"[POLICY LOADED] Successfully loaded {len(policies)} permissions for Principal ID: {principal_id}")
+        manager_logger.info(f"Successfully loaded {len(policies)} permissions for Principal ID: {principal_id}")
 
     def check_permission(self, authority: Authority, required_capability: Capability) -> bool:
         """
         Checks if the given authority has an explicit ALLOW permission for the required capability.
         Returns True only if explicitly permitted by loaded policies.
         """
-        print(f"\n[POLICY CHECK] Checking {authority.role} ({authority.principal_id}) for capability '{required_capability.name}'...")
+        manager_logger.info(f"Checking {authority.role} ({authority.principal_id}) for capability '{required_capability.name}'...")
         
         if authority.principal_id not in self._policies:
-            print("   -> DENIED: No policies found for this Principal ID.")
+            manager_logger.warning("No policies found for this Principal ID.")
             return False
 
         for permission in self._policies[authority.principal_id]:
@@ -39,10 +42,10 @@ class PolicyEngine:
             # 2. 効果（Effect）が許可か、かつアクションが合致するか確認
             # ここではシンプルに 'ALLOW' かつアクションの一致を要求する
             if permission.effect == 'ALLOW':
-                 print(f"   -> ALLOWED: Explicitly permitted via {permission.action} using '{required_capability.name}'.")
+                 manager_logger.info(f"Allowed: Explicitly permitted via {permission.action} using '{required_capability.name}'.")
                  return True
         
-        print("   -> DENIED: No explicit ALLOW permission found for this combination.")
+        manager_logger.warning("No explicit ALLOW permission found for this combination.")
         return False
 
 # =========================================

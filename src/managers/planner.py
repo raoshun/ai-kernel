@@ -1,6 +1,9 @@
 from typing import List, Dict, Any
+
 from src.models.core_entities import Goal, Task
 from src.managers.audit_logger import audit_logger
+
+from ai_kernel._logging import manager_logger
 
 class Planner:
     """
@@ -13,7 +16,7 @@ class Planner:
     - enforce policies
     """
     def __init__(self):
-        print("--> Planner Initialized: Ready for planning.")
+        manager_logger.info("Planner initialized: Ready for planning.")
     
     def create_plan(self, goal: Goal) -> List[Task]:
         """
@@ -25,7 +28,7 @@ class Planner:
         Returns:
             List of Task objects forming the execution plan
         """
-        print(f"\n[PLANNER] Creating plan for goal: {goal.goal_id}")
+        manager_logger.info(f"Creating plan for goal: {goal.goal_id}")
         audit_logger.log(
             source_component="Planner",
             severity="INFO",
@@ -65,7 +68,7 @@ class Planner:
                 dependencies=[]
             ))
         
-        print(f"[PLANNER] Generated {len(tasks)} tasks for goal: {goal.goal_id}")
+        manager_logger.info(f"Generated {len(tasks)} tasks for goal: {goal.goal_id}")
         audit_logger.log(
             source_component="Planner",
             severity="INFO",

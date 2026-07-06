@@ -11,8 +11,11 @@ The Reviewer is responsible for:
 The Reviewer SHALL NOT execute tools directly.
 """
 from typing import List, Dict, Any, Optional
+
 from src.models.core_entities import Task, ExecutionStep
 from src.managers.audit_logger import audit_logger
+
+from ai_kernel._logging import manager_logger
 
 
 class Reviewer:
@@ -20,7 +23,7 @@ class Reviewer:
     Validates execution results and provides feedback for improvement.
     """
     def __init__(self):
-        print("--> Reviewer Initialized: Ready for result validation.")
+        manager_logger.info("Reviewer initialized: Ready for result validation.")
     
     def review_task_execution(
         self, 
@@ -37,7 +40,7 @@ class Reviewer:
         Returns:
             Dictionary containing validation results and recommendations
         """
-        print(f"[REVIEWER] Reviewing task: {task.task_id}")
+        manager_logger.info(f"Reviewing task: {task.task_id}")
         
         validation_result = {
             "task_id": task.task_id,
@@ -104,7 +107,7 @@ class Reviewer:
         Returns:
             Dictionary containing overall review results
         """
-        print(f"[REVIEWER] Reviewing plan execution: {len(tasks)} tasks")
+        manager_logger.info(f"Reviewing plan execution: {len(tasks)} tasks")
         
         task_reviews = []
         success_count = 0

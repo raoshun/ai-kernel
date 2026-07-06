@@ -1,5 +1,8 @@
 from typing import Dict, Optional, List
+
 from src.models.core_entities import Capability
+
+from ai_kernel._logging import manager_logger
 
 class CapabilityManager:
     """
@@ -13,17 +16,17 @@ class CapabilityManager:
             cls._instance = super(CapabilityManager, cls).__new__(cls)
             cls._instance.capabilities: Dict[str, Capability] = {}
             # 初期化時、基本となるコア能力をロードすることを想定
-            print("--> CapabilityManager Initialized: Core capabilities loaded.")
+            manager_logger.info("CapabilityManager initialized: Core capabilities loaded.")
         return cls._instance
     
     def add_capability(self, capability: Capability) -> bool:
         """Registers a new capability if it doesn't conflict with an existing one."""
         if capability.name in self.capabilities:
-            print(f"Warning: Capability '{capability.name}' already exists. Overwriting might be undesirable.")
+            manager_logger.warning(f"Capability '{capability.name}' already exists. Overwriting might be undesirable.")
             return False # 既存定義を尊重し、オーバーライトしない
         
         self.capabilities[capability.name] = capability
-        print(f"[REGISTERED] Capability added: {capability.name} ({capability.scope})")
+        manager_logger.info(f"Capability added: {capability.name} ({capability.scope})")
         return True
 
     def get_capability(self, name: str) -> Optional[Capability]:

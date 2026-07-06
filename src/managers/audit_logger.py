@@ -1,6 +1,9 @@
 from datetime import datetime
 from typing import List, Optional
+
 from src.models.core_entities import AuditRecord
+
+from ai_kernel._logging import manager_logger
 
 class AuditLogger:
     """
@@ -13,7 +16,7 @@ class AuditLogger:
         if cls._instance is None:
             cls._instance = super(AuditLogger, cls).__new__(cls)
             cls._instance.records: List[AuditRecord] = []
-            print("--> AuditLogger Initialized: Ready for recording.")
+            manager_logger.info("AuditLogger initialized: Ready for recording.")
         return cls._instance
     
     def log(self, 
@@ -38,7 +41,7 @@ class AuditLogger:
             related_ids=related_ids or []
         )
         self.records.append(record)
-        print(f"[AUDIT] {record.timestamp.isoformat()} | {source_component} | {severity}: {message}")
+        manager_logger.info(f"{record.timestamp.isoformat()} | {source_component} | {severity}: {message}")
     
     def get_records(self, 
                     source_component: Optional[str] = None,

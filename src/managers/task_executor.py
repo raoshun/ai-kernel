@@ -1,6 +1,9 @@
 from typing import Any, Dict, List, Optional
+
 from src.models.core_entities import ExecutionStep, Task
 from src.managers.audit_logger import audit_logger
+
+from ai_kernel._logging import manager_logger
 
 class TaskExecutor:
     """
@@ -14,7 +17,7 @@ class TaskExecutor:
     """
     def __init__(self):
         self.tools: Dict[str, Any] = {}  # Registry of available tools
-        print("--> TaskExecutor Initialized: Ready for execution.")
+        manager_logger.info("TaskExecutor initialized: Ready for execution.")
     
     def register_tool(self, name: str, tool_instance: Any) -> None:
         """Registers a tool for use by the executor."""
@@ -37,7 +40,7 @@ class TaskExecutor:
         Returns:
             List of ExecutionStep results
         """
-        print(f"\n[EXECUTOR] Starting task: {task.task_id}")
+        manager_logger.info(f"Starting task: {task.task_id}")
         audit_logger.log(
             source_component="TaskExecutor",
             severity="INFO",
@@ -51,7 +54,7 @@ class TaskExecutor:
         # In a real system, this would iterate through required tool invocations
         for capability in task.required_capabilities:
             if capability not in context.get('granted_capabilities', []):
-                print(f"   -> SKIPPED: Capability '{capability}' not in granted capabilities.")
+                manager_logger.warning(f"Capability '{capability}' not in granted capabilities.")
                 audit_logger.log(
                     source_component="TaskExecutor",
                     severity="WARNING",
@@ -67,7 +70,7 @@ class TaskExecutor:
                 actual_output=f"Simulated output for {capability}"
             )
             execution_steps.append(step)
-            print(f"   -> Executed: {capability}")
+            manager_logger.info(f"Executed: {capability}")
         
         audit_logger.log(
             source_component="TaskExecutor",

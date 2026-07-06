@@ -11,12 +11,15 @@ The Kernel is responsible for:
 - task orchestration
 """
 from typing import Dict, List, Optional, Any
+
 from src.models.core_entities import Goal, Task, Authority, Capability
 from src.managers.planner import planner
 from src.managers.policy_engine import policy_engine
 from src.managers.capability_manager import capability_manager
 from src.managers.task_executor import task_executor
 from src.managers.audit_logger import audit_logger
+
+from ai_kernel._logging import kernel_logger
 
 
 class Kernel:
@@ -28,7 +31,7 @@ class Kernel:
         self.user_authority = user_authority
         self.state: Dict[str, Any] = {}
         
-        print(f"--> Kernel Initialized for user: {user_authority.principal_id}")
+        kernel_logger.info(f"Kernel initialized for user: {user_authority.principal_id}")
         audit_logger.log(
             source_component="Kernel",
             severity="INFO",
@@ -41,9 +44,7 @@ class Kernel:
         Main entry point for processing a user goal.
         Implements the full execution lifecycle.
         """
-        print(f"\n{'='*60}")
-        print(f"[KERNEL] Processing goal: {goal.goal_id}")
-        print(f"{'='*60}")
+        kernel_logger.info(f"Processing goal: {goal.goal_id}")
         
         audit_logger.log(
             source_component="Kernel",
@@ -54,11 +55,11 @@ class Kernel:
         
         # Phase 1: Planning
         tasks = planner.create_plan(goal)
-        print(f"[KERNEL] Planning complete: {len(tasks)} tasks generated")
+        kernel_logger.info(f"Planning complete: {len(tasks)} tasks generated")
         
         # Phase 2: Risk Assessment
         risk_assessment = planner.estimate_risk(tasks)
-        print(f"[KERNEL] Risk Assessment: {risk_assessment['risk_level']}")
+        kernel_logger.info(f"Risk Assessment: {risk_assessment['risk_level']}")
         
         if risk_assessment.get("requires_human_approval"):
             audit_logger.log(
@@ -75,13 +76,13 @@ class Kernel:
         
         # Phase 3: Policy Evaluation & Capability Grant
         authorized_capabilities = self._authorize_capabilities(tasks)
-        print(f"[KERNEL] Authorized capabilities: {len(authorized_capabilities)} granted")
+        kernel_logger.info(f"Authorized capabilities: {len(authorized_capabilities)} granted")
         
         # Phase 4: Execution
         execution_results = self._execute_tasks(tasks, authorized_capabilities, goal.goal_id)
         
         # Phase 5: Audit Logging (already done throughout)
-        print(f"[KERNEL] Goal processing complete: {goal.goal_id}")
+        kernel_logger.info(f"Goal processing complete: {goal.goal_id}")
         
         return {
             "status": "COMPLETED",
