@@ -1,7 +1,7 @@
 from typing import List, Dict, Any
 
-from src.models.core_entities import Goal, Task
-from src.managers.audit_logger import audit_logger
+from models.core_entities import Goal, Task
+from managers.audit_logger import audit_logger
 
 from ai_kernel._logging import manager_logger
 

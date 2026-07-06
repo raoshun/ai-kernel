@@ -1,7 +1,7 @@
 from typing import Any, Dict, List, Optional
 
-from src.models.core_entities import ExecutionStep, Task
-from src.managers.audit_logger import audit_logger
+from models.core_entities import ExecutionStep, Task
+from managers.audit_logger import audit_logger
 
 from ai_kernel._logging import manager_logger
 

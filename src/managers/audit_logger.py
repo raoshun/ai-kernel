@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List, Optional
 
-from src.models.core_entities import AuditRecord
+from models.core_entities import AuditRecord
 
 from ai_kernel._logging import manager_logger
 

@@ -13,7 +13,7 @@ The Risk Assessor SHALL NOT execute operations.
 """
 from typing import List, Dict, Any, Literal
 
-from src.models.core_entities import Task
+from models.core_entities import Task
 
 from ai_kernel._logging import manager_logger
 

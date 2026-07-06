@@ -1,6 +1,6 @@
 from typing import Dict, Optional, List
 
-from src.models.core_entities import Capability
+from models.core_entities import Capability
 
 from ai_kernel._logging import manager_logger
 

@@ -12,9 +12,9 @@ The Reviewer SHALL NOT execute tools directly.
 """
 from typing import List, Dict, Any, Optional
 
-from src.models.core_entities import Task, ExecutionStep
-from src.managers.audit_logger import audit_logger
-from src.managers.validation_helper import ExecutionValidator
+from models.core_entities import Task, ExecutionStep
+from managers.audit_logger import audit_logger
+from managers.validation_helper import ExecutionValidator
 
 from ai_kernel._logging import manager_logger
 

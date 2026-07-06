@@ -7,7 +7,7 @@ Provides common patterns for:
 - Result status classification
 """
 from typing import Dict, Any, List, Literal
-from src.models.core_entities import ExecutionStep
+from models.core_entities import ExecutionStep
 
 from ai_kernel._logging import manager_logger
 

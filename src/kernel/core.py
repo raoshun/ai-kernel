@@ -12,12 +12,12 @@ The Kernel is responsible for:
 """
 from typing import Dict, List, Optional, Any
 
-from src.models.core_entities import Goal, Task, Authority, Capability
-from src.managers.planner import planner
-from src.managers.policy_engine import policy_engine
-from src.managers.capability_manager import capability_manager
-from src.managers.task_executor import task_executor
-from src.managers.audit_logger import audit_logger
+from models.core_entities import Goal, Task, Authority, Capability
+from managers.planner import planner
+from managers.policy_engine import policy_engine
+from managers.capability_manager import capability_manager
+from managers.task_executor import task_executor
+from managers.audit_logger import audit_logger
 
 from ai_kernel._logging import kernel_logger
 

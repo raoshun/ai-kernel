@@ -1,7 +1,7 @@
 from typing import List, Dict
 
-from src.models.core_entities import Authority, Capability, Permission
-from src.managers.capability_manager import capability_manager
+from models.core_entities import Authority, Capability, Permission
+from managers.capability_manager import capability_manager
 
 from ai_kernel._logging import manager_logger
 
