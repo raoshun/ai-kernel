@@ -41,6 +41,8 @@ Policies SHALL be evaluated before every execution.
 
 The Policy Engine evaluates execution requests.
 
+It is the core policy evaluation subsystem used by the Policy Guardian.
+
 Its responsibilities include:
 
 * validating constitutional compliance;
@@ -48,6 +50,8 @@ Its responsibilities include:
 * evaluating operational risk;
 * determining required approvals;
 * producing policy decisions.
+
+The Policy Engine MAY consume risk assessments and operational risk inputs from a dedicated Risk Assessor component.
 
 The Policy Engine SHALL NOT execute Tools.
 

@@ -39,6 +39,15 @@ Examples:
 * Researcher
 * Reviewer
 * Executor
+* Risk Assessor
+
+### Risk Assessor
+
+A Kernel component responsible for evaluating operational risk, assigning risk levels, and recommending mitigations.
+
+The Risk Assessor provides risk assessment inputs to the Policy Guardian and Policy Engine.
+
+The Risk Assessor SHALL NOT execute operations.
 
 ### Kernel
 
@@ -142,13 +151,55 @@ Policies are enforced by the Kernel.
 
 Policies SHALL NOT depend solely on LLM reasoning.
 
-### Guardian
+### Policy Guardian
 
 The Kernel component responsible for enforcing policies.
 
-The Guardian evaluates execution requests and determines whether they may proceed.
+The Policy Guardian evaluates execution requests and determines whether they may proceed.
 
-The Guardian never creates execution plans.
+The Policy Guardian never creates execution plans.
+
+The Policy Guardian is the architectural role fulfilled by the Policy Engine in the Kernel's policy subsystem.
+
+### Capability Manager
+
+A Kernel component responsible for issuing temporary Capabilities, revoking Capabilities, and enforcing least privilege.
+
+The Capability Manager determines the scope, lifetime, and constraints of granted Capabilities, and records Capability grants for audit.
+
+The Capability Manager SHALL NOT evaluate policy decisions.
+
+### Policy Engine
+
+The Policy Engine is the core policy evaluation subsystem used by the Policy Guardian.
+
+It evaluates execution requests, validates constitutional and project policies, assesses risk, and produces policy decisions.
+
+The Policy Engine SHALL NOT execute Tools or grant Capabilities.
+
+### Executor
+
+A Kernel component responsible for invoking approved Tools and executing authorized Functions.
+
+The Executor SHALL NOT modify policy, modify capabilities, or bypass authorization.
+
+### Reviewer
+
+A Kernel component responsible for validating execution results, detecting failures, and recommending improvements.
+
+The Reviewer SHALL NOT execute Tools directly.
+
+### Memory Manager
+
+A Kernel component responsible for persistent storage, contextual retrieval, and knowledge organization.
+
+The Memory Manager SHALL NOT override policy decisions.
+
+### Audit Logger
+
+A Kernel component responsible for recording immutable audit records for objectives, execution plans, granted capabilities, tool invocations, and results.
+
+The Audit Logger SHALL preserve the integrity and observability of Kernel activity.
 
 ### Task
 

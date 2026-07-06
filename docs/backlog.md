@@ -3,7 +3,7 @@
 ## Backlogs
 
 - P0
-  - Guardian
+  - Policy Guardian
   - Capability
   - Audit
 - P1

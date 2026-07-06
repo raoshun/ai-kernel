@@ -265,7 +265,7 @@ Typical Producers include:
 
 * Kernel
 * Planner
-* Guardian
+* Policy Guardian
 * Capability Manager
 * Executor
 * Reviewer

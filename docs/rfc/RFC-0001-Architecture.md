@@ -90,7 +90,7 @@ Components should remain replaceable whenever practical.
                  │
              Objectives
                  │
-          Planner Agent
+          Planner
                  │
          Risk Assessment
                  │
@@ -100,7 +100,7 @@ Components should remain replaceable whenever practical.
                  │
          Execution Queue
                  │
-         Executor Agent
+         Executor
                  │
       Function Calling Layer
                  │
@@ -111,7 +111,7 @@ Operating System / Tools / Services
 │
 Result Collector
 │
-Reviewer Agent
+Reviewer
 │
 Audit Logger
 │
@@ -147,6 +147,7 @@ Responsible for:
 - evaluating operational risk;
 - assigning risk levels;
 - recommending mitigations.
+- providing risk assessment inputs to the Policy Guardian.
 
 The Risk Assessor SHALL NOT execute operations.
 
@@ -160,7 +161,7 @@ Responsible for:
 - validating policy compliance;
 - approving or rejecting execution requests.
 
-The Guardian SHALL NOT generate execution plans.
+The Policy Guardian SHALL NOT generate execution plans.
 
 ---
 
