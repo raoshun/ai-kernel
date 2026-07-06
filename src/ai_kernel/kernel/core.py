@@ -23,6 +23,7 @@ from ai_kernel.message.protocol import AuditLog, ExecutionResponse
 from ai_kernel.model.execution import Execution, ExecutionState
 from ai_kernel.model.task import Task
 from ai_kernel.policy.rules import DefaultPolicies, PolicyDecision, PolicyRule
+from ai_kernel.plugin import BasePlugin
 
 
 class AuditLogger:
@@ -164,6 +165,7 @@ class Kernel:
         self.capability_manager = CapabilityManager()
         self.audit_logger = AuditLogger()
         self.executions: dict[UUID, Execution] = {}
+        self._plugins: dict[str, BasePlugin] = {}
 
     def submit_execution(self, task: Task) -> Execution | None:
         """
@@ -205,6 +207,29 @@ class Kernel:
             execution.error = error
             self.audit_logger.log_execution_result(execution, state)
 
+    def cancel_execution(self, execution_id: UUID) -> bool:
+        """Cancel an execution if it is still active."""
+        if execution_id not in self.executions:
+            return False
+
+        execution = self.executions[execution_id]
+        if execution.state in (
+            ExecutionState.COMPLETED,
+            ExecutionState.FAILED,
+            ExecutionState.CANCELLED,
+        ):
+            return False
+
+        execution.state = ExecutionState.CANCELLED
+        execution.error = "Execution cancelled"
+        self.capability_manager.revoke_all(execution.task.id)
+        self.audit_logger.log_execution_result(
+            execution,
+            ExecutionState.CANCELLED,
+            message="Execution cancelled by user",
+        )
+        return True
+
     def get_execution(self, execution_id: UUID) -> Execution | None:
         """Retrieve execution by ID."""
         return self.executions.get(execution_id)
@@ -212,3 +237,29 @@ class Kernel:
     def get_audit_logs(self, execution_id: UUID | None = None) -> list[AuditLog]:
         """Retrieve audit logs."""
         return self.audit_logger.get_logs(execution_id)
+
+    def register_plugin(self, plugin: BasePlugin) -> bool:
+        """Register a plugin if its identifier is not already present."""
+        if plugin.identifier in self._plugins:
+            return False
+        self._plugins[plugin.identifier] = plugin
+        return True
+
+    def get_plugins(self) -> dict[str, BasePlugin]:
+        """Return a copy of the registered plugins."""
+        return dict(self._plugins)
+
+    def unregister_plugin(self, plugin_id: str) -> bool:
+        """Remove a registered plugin."""
+        if plugin_id not in self._plugins:
+            return False
+        del self._plugins[plugin_id]
+        return True
+
+    def initialize_plugins(self) -> None:
+        """Initialize all registered plugins without breaking the kernel."""
+        for plugin in self._plugins.values():
+            try:
+                plugin.initialize()
+            except Exception:
+                continue

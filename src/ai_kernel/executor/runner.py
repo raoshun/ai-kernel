@@ -15,6 +15,7 @@ from ai_kernel.capability.model import CapabilityType
 from ai_kernel.kernel.core import Kernel
 from ai_kernel.model.execution import Execution, ExecutionState
 from ai_kernel.model.task import Task
+from ai_kernel.executor.ollama_executor import OllamaExecutor
 
 
 class Executor(ABC):
@@ -36,11 +37,17 @@ class BasicExecutor(Executor):
     def execute(self, execution: Execution, kernel: Kernel) -> None:
         """Execute a task if authorized."""
         try:
+            if execution.state == ExecutionState.CANCELLED:
+                raise RuntimeError("Execution has been cancelled")
+
             # Check if we have Python execution capability
             if not kernel.capability_manager.has_capability(
                 execution.task.id, CapabilityType.PYTHON_EXECUTE
             ):
                 raise PermissionError("Python execution capability not granted")
+
+            execution.state = ExecutionState.RUNNING
+            kernel.report_execution_result(execution.id, ExecutionState.RUNNING)
 
             # Execute the task objective as Python code
             result = self._execute_python(execution.task.objective)
@@ -76,11 +83,17 @@ class ShellExecutor(Executor):
     def execute(self, execution: Execution, kernel: Kernel) -> None:
         """Execute a shell command if authorized."""
         try:
+            if execution.state == ExecutionState.CANCELLED:
+                raise RuntimeError("Execution has been cancelled")
+
             # Check if we have shell execution capability
             if not kernel.capability_manager.has_capability(
                 execution.task.id, CapabilityType.SHELL_EXECUTE
             ):
                 raise PermissionError("Shell execution capability not granted")
+
+            execution.state = ExecutionState.RUNNING
+            kernel.report_execution_result(execution.id, ExecutionState.RUNNING)
 
             # Execute the command
             result = self._execute_shell(execution.task.objective)
@@ -125,6 +138,7 @@ class ExecutorRegistry:
             "basic": BasicExecutor(),
             "shell": ShellExecutor(),
             "python": BasicExecutor(),  # Default to basic for Python
+            "ollama": OllamaExecutor(),  # Ollama-powered natural language executor
         }
 
     def execute(

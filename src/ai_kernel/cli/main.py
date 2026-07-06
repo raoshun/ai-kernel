@@ -32,14 +32,17 @@ def version():
 def run(
     objective: str = typer.Argument(..., help="Task objective to execute"),
     executor: str = typer.Option(
-        "basic", help="Executor to use (basic, shell, python)"
+        "ollama",
+        help="Executor to use: basic (Python code), shell (shell commands), ollama (natural language with Ollama)",
     ),
 ) -> None:
     """
     Submit a task for execution.
 
-    Example:
-        ai-kernel run "print('Hello, World!')"
+    Examples:
+        ai-kernel run "print('Hello, World!')" --executor basic
+        ai-kernel run "Create a block breaker game" --executor ollama
+        ai-kernel run "ls -la" --executor shell
     """
     console.print(f"[blue]Submitting task:[/blue] {objective}")
 
@@ -141,6 +144,23 @@ def logs(
             )
 
         console.print(table)
+
+    except ValueError:
+        console.print("[red]✗ Invalid execution ID[/red]")
+
+
+@app.command()
+def cancel(execution_id: str = typer.Argument(..., help="Execution ID to cancel")) -> None:
+    """Cancel a pending or running execution."""
+    try:
+        exec_uuid = UUID(execution_id)
+        cancelled = kernel.cancel_execution(exec_uuid)
+
+        if not cancelled:
+            console.print("[yellow]✗ Execution could not be cancelled[/yellow]")
+            return
+
+        console.print("[green]✓ Execution cancelled[/green]")
 
     except ValueError:
         console.print("[red]✗ Invalid execution ID[/red]")
